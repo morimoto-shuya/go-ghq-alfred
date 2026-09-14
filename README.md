@@ -49,15 +49,10 @@ And I recommend you to specify a editor and terminal app. Default is `Visual Stu
 
 ## Build
 
-My environment is as follows.
-
-* Go 1.27
-* Glide 0.12.3
-
 ```bash
-$ glide update
-$ go test $(glide novendor) -v
-$ go build .
+$ mise run test
+$ mise run build
+$ mise run dist
 ```
 
 ## Attributes

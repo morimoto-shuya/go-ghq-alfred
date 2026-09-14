@@ -1,0 +1,27 @@
+[tools]
+go = "1.27.1"
+
+[tasks.test]
+description = "Run tests"
+run = """
+mkdir -p testdir/cache testdir/data
+go test ./... -v
+"""
+
+[tasks.test.env]
+alfred_workflow_bundleid = "testid"
+alfred_workflow_cache = "testdir/cache"
+alfred_workflow_data = "testdir/data"
+
+[tasks.build]
+description = "Build binary"
+run = "go build -o dist/go-ghq-alfred ."
+
+[tasks.dist]
+description = "Build distribution package"
+depends = ["build"]
+run = """
+mkdir -p dist/
+cp -r resources/* dist/
+cd dist && zip -r ../ghq-alfred.alfredworkflow ./*
+"""
