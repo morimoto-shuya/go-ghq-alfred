@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"io"
 	"os"
 	"path"
 	"strings"
@@ -12,7 +14,7 @@ import (
 const (
 	appName    = "ghq-alfred"
 	appDesc    = "Search your local repos"
-	appVersion = "0.4.0"
+	appVersion = "0.4.1"
 )
 
 var (
@@ -20,7 +22,7 @@ var (
 	gitHubIcon    = &aw.Icon{Value: path.Join("github-logo.png")}
 	bitBucketIcon = &aw.Icon{Value: path.Join("bitbucket-logo.png")}
 	gitIcon       = &aw.Icon{Value: path.Join("git-logo.png")}
-	modKeys       = []aw.ModKey{
+	modKeys       = []string{
 		aw.ModCmd,
 		aw.ModOpt,
 		aw.ModFn,
@@ -29,38 +31,71 @@ var (
 	}
 )
 
-func init() {
-	wf = aw.New()
+func workflow() *aw.Workflow {
+	if wf == nil {
+		wf = aw.New()
+	}
+	return wf
 }
 
 func run() {
+	w := workflow()
 	app := cli.NewApp()
 	app.Name = appName
 	app.Usage = appDesc
 	app.Version = appVersion
 	app.Action = func(c *cli.Context) error {
-		query := strings.Trim(c.Args()[0], " \n")
-		repos := c.Args()[1:c.NArg()]
+		args := c.Args()
+		query := strings.Trim(args.First(), " \n")
+		var repoArgs []string
+		if c.NArg() > 1 {
+			repoArgs = args[1:c.NArg()]
+		}
+		repos, err := readRepositories(repoArgs, os.Stdin)
+		if err != nil {
+			return err
+		}
 		for _, repo := range repos {
 			addNewItem(repo)
 		}
 		if len(query) > 0 {
-			wf.Filter(query)
+			w.Filter(query)
 		}
-		wf.WarnEmpty("No matching repository", "Try different query?")
-		wf.SendFeedback()
+		w.WarnEmpty("No matching repository", "Try different query?")
+		w.SendFeedback()
 		return nil
 	}
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		workflow().FatalError(err)
+	}
+}
+
+func readRepositories(args []string, input io.Reader) ([]string, error) {
+	if len(args) > 0 {
+		return args, nil
+	}
+
+	var repos []string
+	scanner := bufio.NewScanner(input)
+	for scanner.Scan() {
+		if scanner.Text() != "" {
+			repos = append(repos, scanner.Text())
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return repos, nil
 }
 
 func main() {
-	wf.Run(run)
+	workflow().Run(run)
 }
 
 func addNewItem(repo string) {
+	w := workflow()
 	repoPath := strings.Split(repo, "/")
-	it := wf.NewItem(repo).
+	it := w.NewItem(repo).
 		Title(excludeDomain(repoPath, true)).
 		UID(repo).
 		Arg(repo).
@@ -92,7 +127,7 @@ func getDomainName(repo_path []string) string {
 	return repo_path[len(repo_path)-3]
 }
 
-func createModItem(repo []string, path string, modKey aw.ModKey) *aw.Modifier {
+func createModItem(repo []string, path string, modKey string) *aw.Modifier {
 	var (
 		arg string
 		sub string
