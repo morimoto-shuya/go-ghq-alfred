@@ -86,7 +86,7 @@
 			<key>config</key>
 			<dict>
 				<key>alfredfiltersresults</key>
-				<false/>
+				<true/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
@@ -110,7 +110,7 @@
 				<key>runningsubtext</key>
 				<string></string>
 				<key>script</key>
-				<string>./go-ghq-alfred "{query}" $($ghq list -p)</string>
+				<string>"$ghq" list -p | ./go-ghq-alfred ""</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -296,7 +296,7 @@ bitbucket logo
 		<string>/usr/local/bin/ghq</string>
 	</dict>
 	<key>version</key>
-	<string>0.4.0</string>
+	<string>0.4.1</string>
 	<key>webaddress</key>
 	<string>https://www.poyo.info/</string>
 </dict>

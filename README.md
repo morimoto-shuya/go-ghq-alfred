@@ -14,14 +14,23 @@ Search local repos with ghq in Alfred Workflow.
 This tool is a CLI tool. Output JSON strings.
 
 ```bash
-$ ./go-alfred-ghq '{query}' $(ghq list -p)
+$ ./go-ghq-alfred '{query}' $(ghq list -p)
+```
+
+Repository paths can also be read from standard input. This avoids shell argument
+length limits when you have many repositories.
+
+```bash
+$ ghq list -p | ./go-ghq-alfred '{query}'
 ```
 
 ## In Alfred
 
 This workflow start with `ghq {query}` in alfred.  
 
-Filtering the result of `ghq list -p` with `{query}` and show them.
+The workflow runs `ghq list -p` once when the search starts, then Alfred filters
+the returned repositories as you type. This keeps incremental search responsive
+even with a large repository list.
 
 ### Preparing
 
@@ -42,7 +51,7 @@ And I recommend you to specify a editor and terminal app. Default is `Visual Stu
 
 My environment is as follows.
 
-* Go 1.9
+* Go 1.27
 * Glide 0.12.3
 
 ```bash
