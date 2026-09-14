@@ -14,7 +14,7 @@ import (
 const (
 	appName    = "ghq-alfred"
 	appDesc    = "Search your local repos"
-	appVersion = "0.4.1"
+	appVersion = "0.5.0"
 )
 
 var (

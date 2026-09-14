@@ -69,7 +69,7 @@ Icon made by Swifticons from www.flaticon.com
 
 ## Author
 
-pudding
+morimoto-shuya
 
 ## License
 
